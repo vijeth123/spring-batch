@@ -14,7 +14,7 @@
     <batch:job id="CSV_TO_HSQL_JOB">
         <batch:step id="step1">
             <batch:tasklet>
-                <batch:chunk reader="csvFileItemReader" processor="customItemProcessor"  writer="mysqlItemWriter" commit-interval="3"/>
+                <batch:chunk reader="csvFileItemReader" processor="customItemProcessor"  writer="hSqlItemWriter" commit-interval="3"/>
             </batch:tasklet>
         </batch:step>
     </batch:job>
@@ -37,7 +37,7 @@
 
     <bean id="skippedLinesCallback" class="com.vijeth.util.CustomLineCallbackHandler"/>
 
-    <bean id="mysqlItemWriter"
+    <bean id="hSqlItemWriter"
           class="org.springframework.batch.item.database.JdbcBatchItemWriter">
         <property name="dataSource" ref="dataSource" />
         <property name="sql">
