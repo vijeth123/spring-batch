@@ -1,0 +1,46 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:batch="http://www.springframework.org/schema/batch"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/batch
+		http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+        http://www.springframework.org/schema/context
+	    http://www.springframework.org/schema/context/spring-context-2.5.xsd
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+    <task:annotation-driven scheduler="myScheduler"/>
+    <task:scheduler id="myScheduler" pool-size="5"/>
+
+    <context:component-scan base-package="com.vijeth"/>
+
+    <batch:job id="CSV_TO_CONSOLE_JOB">
+        <batch:step id="step1">
+            <batch:tasklet>
+                <batch:chunk reader="csvFileItemReader" writer="consoleItemWriter" commit-interval="3"/>
+            </batch:tasklet>
+        </batch:step>
+    </batch:job>
+
+    <bean id="csvFileItemReader" class="org.springframework.batch.item.file.FlatFileItemReader">
+        <property name="linesToSkip" value="1"/>
+        <property name="skippedLinesCallback" ref="skippedLinesCallback" ></property>
+        <property name="resource" value="classpath:input/report.csv" />
+        <property name="lineMapper">
+            <bean class="org.springframework.batch.item.file.mapping.DefaultLineMapper">
+                <property name="lineTokenizer" ref="lineTokenizer"></property>
+                <property name="fieldSetMapper">
+                    <bean class="com.vijeth.util.ReportFieldSetMapper" />
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="lineTokenizer" class="org.springframework.batch.item.file.transform.DelimitedLineTokenizer"/>
+
+    <bean id="skippedLinesCallback" class="com.vijeth.util.CustomLineCallbackHandler"/>
+
+</beans>
